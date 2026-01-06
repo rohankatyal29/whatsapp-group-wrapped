@@ -8,25 +8,16 @@ A Claude Code skill that analyzes your WhatsApp group chats and generates Spotif
 - [Claude Code CLI](https://claude.ai/claude-code)
 - Python 3 (pre-installed on macOS)
 
+## Installation
+
+```bash
+curl -L https://github.com/rohankatyal29/whatsapp-group-wrapped/archive/main.tar.gz | tar -xz
+cd whatsapp-group-wrapped-main
+```
+
 ## Usage
 
-Invoke the skill in Claude Code:
-
-```
-/whatsapp-group-wrapped Family Chat
-```
-
-### List Available Chats
-
-```
-/whatsapp-group-wrapped
-```
-
-### Privacy Mode (Redact Names)
-
-```
-/whatsapp-group-wrapped Family Chat --redact
-```
+Invoke the `/whatsapp-group-wrapped` skill in the Claude Code CLI.
 
 ## What the Report Includes
 

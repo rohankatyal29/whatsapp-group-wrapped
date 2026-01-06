@@ -8,18 +8,9 @@ A Claude Code skill that analyzes your WhatsApp group chats and generates Spotif
 - [Claude Code CLI](https://claude.ai/claude-code)
 - Python 3 (pre-installed on macOS)
 
-## Installation
-
-Clone this repo and symlink to your Claude skills directory:
-
-```bash
-git clone https://github.com/rohankatyal29/whatsapp-group-wrapped.git
-ln -s $(pwd)/whatsapp-group-wrapped/.claude/skills/whatsapp-group-wrapped ~/.claude/skills/whatsapp-group-wrapped
-```
-
 ## Usage
 
-Open Claude Code and run:
+Open Claude Code in this repo and run:
 
 ```
 /whatsapp-group-wrapped Family Chat

@@ -10,7 +10,7 @@ A Claude Code skill that analyzes your WhatsApp group chats and generates Spotif
 
 ## Usage
 
-Open Claude Code in this repo and run:
+Invoke the skill in Claude Code:
 
 ```
 /whatsapp-group-wrapped Family Chat

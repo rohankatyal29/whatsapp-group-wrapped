@@ -351,7 +351,8 @@
   min-height: 90px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  text-align: left;
   padding: 1rem 1.5rem;
   border: none;
   cursor: pointer;
@@ -359,6 +360,14 @@
   overflow: hidden;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
   box-shadow: var(--shadow-brutal);
+  line-height: 1.4;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.option-btn span {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 /* Shine overlay */
@@ -648,6 +657,14 @@
   color: var(--next-vermilion) !important;
 }
 
+/* Question text handling for long questions */
+.question-text {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  line-height: 1.5;
+}
+
 /* === RESPONSIVE DESIGN === */
 
 /* Mobile */
@@ -657,6 +674,7 @@
     border-left: none;
     border-right: none;
     border-radius: 0;
+    padding-bottom: env(safe-area-inset-bottom, 16px);
   }
 
   .galette-shell::before,

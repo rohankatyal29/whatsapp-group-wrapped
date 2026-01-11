@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Play - WhatsApp Group Wrapped Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/css/galette.css">
+</head>
+<body class="galette-body">
+    <div class="container mx-auto px-4 py-6 max-w-lg galette-shell">
+        <!-- Join View -->
+        <div id="join-view">
+            <h1 class="text-2xl font-bold text-center mb-8">Join Quiz</h1>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-gray-400 mb-2">Game Code</label>
+                    <input type="text" id="game-code-input" maxlength="4"
+                        class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-2xl text-center uppercase tracking-widest"
+                        placeholder="ABCD">
+                </div>
+
+                <div>
+                    <label class="block text-gray-400 mb-2">Your Name</label>
+                    <input type="text" id="player-name-input" maxlength="20"
+                        class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-xl"
+                        placeholder="Enter your name">
+                </div>
+
+                <button id="join-btn" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 rounded-lg text-xl mt-4">
+                    Join Game
+                </button>
+
+                <p id="error-msg" class="text-red-500 text-center hidden"></p>
+            </div>
+        </div>
+
+        <!-- Waiting View -->
+        <div id="waiting-view" class="hidden text-center">
+            <h1 class="text-2xl font-bold mb-4">You're In!</h1>
+            <p class="text-gray-400 mb-8">Waiting for the quiz master to start the game...</p>
+
+            <div class="bg-gray-800 rounded-lg p-6">
+                <p class="text-gray-400 mb-2">Players</p>
+                <ul id="player-list" class="space-y-2"></ul>
+            </div>
+        </div>
+
+        <!-- Question View -->
+        <div id="question-view" class="hidden">
+            <div class="text-center mb-4">
+                <p class="text-gray-400">Question <span id="question-num">1</span> of <span id="total-questions">5</span></p>
+            </div>
+
+            <div class="bg-gray-800 rounded-lg p-4 mb-6">
+                <h2 id="question-text" class="text-xl font-semibold text-center"></h2>
+            </div>
+
+            <div class="grid grid-cols-1 gap-3" id="options-container">
+                <button class="option-btn option-0 rounded-lg text-lg font-semibold" data-index="0">
+                    <span class="mr-2 font-bold">A.</span> <span id="option-text-0"></span>
+                </button>
+                <button class="option-btn option-1 rounded-lg text-lg font-semibold" data-index="1">
+                    <span class="mr-2 font-bold">B.</span> <span id="option-text-1"></span>
+                </button>
+                <button class="option-btn option-2 rounded-lg text-lg font-semibold" data-index="2">
+                    <span class="mr-2 font-bold">C.</span> <span id="option-text-2"></span>
+                </button>
+                <button class="option-btn option-3 rounded-lg text-lg font-semibold" data-index="3">
+                    <span class="mr-2 font-bold">D.</span> <span id="option-text-3"></span>
+                </button>
+            </div>
+
+            <div class="bg-gray-800 rounded-lg p-3 mt-4 text-center">
+                <p class="text-gray-400">Answer Progress</p>
+                <p class="text-lg">
+                    <span id="player-answer-count">0</span> / <span id="player-total-players">0</span>
+                    <span class="mx-2">•</span>
+                    Remaining: <span id="player-remaining-count">0</span>
+                </p>
+            </div>
+
+            <div id="answer-status" class="text-center mt-6 hidden">
+                <p class="text-xl">Answer locked in!</p>
+                <p class="text-gray-400">Waiting for reveal...</p>
+            </div>
+        </div>
+
+        <!-- Result View -->
+        <div id="result-view" class="hidden text-center">
+            <div id="result-correct" class="hidden">
+                <p class="text-6xl mb-4">✓</p>
+                <h2 class="text-3xl font-bold text-green-400 mb-2">Correct!</h2>
+                <p id="points-earned" class="text-xl text-gray-400">+150 points</p>
+            </div>
+
+            <div id="result-incorrect" class="hidden">
+                <p class="text-6xl mb-4">✗</p>
+                <h2 class="text-3xl font-bold text-red-400 mb-2">Wrong!</h2>
+                <p id="correct-was" class="text-xl text-gray-400">The answer was: <span id="correct-answer-text"></span></p>
+            </div>
+
+            <div class="bg-gray-800 rounded-lg p-6 mt-8">
+                <p class="text-gray-400 mb-2">Your Score</p>
+                <p id="current-score" class="text-4xl font-bold"></p>
+                <p id="current-rank" class="text-gray-400 mt-2"></p>
+            </div>
+        </div>
+
+        <!-- Game Over View -->
+        <div id="gameover-view" class="hidden text-center">
+            <h1 class="text-3xl font-bold mb-8">Game Over!</h1>
+
+            <div class="bg-gray-800 rounded-lg p-6 mb-6">
+                <p class="text-gray-400 mb-2">Your Final Score</p>
+                <p id="final-score" class="text-5xl font-bold text-purple-400"></p>
+                <p id="final-rank" class="text-xl text-gray-400 mt-2"></p>
+            </div>
+
+            <div class="bg-gray-800 rounded-lg p-6">
+                <h3 class="text-xl font-semibold mb-4">Final Rankings</h3>
+                <ol id="final-rankings" class="space-y-2 text-left"></ol>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let ws = null;
+        let playerId = null;
+        let playerName = null;
+        let gameCode = null;
+        let selectedAnswer = null;
+        let currentQuestion = null;
+
+        // DOM Elements
+        const joinView = document.getElementById('join-view');
+        const waitingView = document.getElementById('waiting-view');
+        const questionView = document.getElementById('question-view');
+        const resultView = document.getElementById('result-view');
+        const gameoverView = document.getElementById('gameover-view');
+
+        // Setup
+        document.getElementById('join-btn').addEventListener('click', joinGame);
+        document.getElementById('game-code-input').addEventListener('input', (e) => {
+            e.target.value = e.target.value.toUpperCase();
+        });
+
+        // Allow Enter key to submit
+        document.getElementById('player-name-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') joinGame();
+        });
+
+        // Option buttons
+        document.querySelectorAll('.option-btn').forEach(btn => {
+            btn.addEventListener('click', () => selectAnswer(parseInt(btn.dataset.index)));
+        });
+
+        function joinGame() {
+            gameCode = document.getElementById('game-code-input').value.trim().toUpperCase();
+            playerName = document.getElementById('player-name-input').value.trim();
+
+            if (!gameCode || gameCode.length !== 4) {
+                showError('Please enter a 4-letter game code');
+                return;
+            }
+            if (!playerName) {
+                showError('Please enter your name');
+                return;
+            }
+
+            connectWebSocket();
+        }
+
+        function showError(msg) {
+            const errorEl = document.getElementById('error-msg');
+            errorEl.textContent = msg;
+            errorEl.classList.remove('hidden');
+            setTimeout(() => errorEl.classList.add('hidden'), 3000);
+        }
+
+        function connectWebSocket() {
+            ws = new WebSocket(`ws://${window.location.host}/ws/player/${gameCode}/${encodeURIComponent(playerName)}`);
+
+            ws.onmessage = (event) => {
+                const msg = JSON.parse(event.data);
+                handleMessage(msg);
+            };
+
+            ws.onerror = () => {
+                showError('Could not connect to game');
+            };
+
+            ws.onclose = (event) => {
+                if (event.code === 4004) {
+                    showError('Game not found');
+                } else if (event.code === 4003) {
+                    showError('Game already started');
+                }
+            };
+        }
+
+        function handleMessage(msg) {
+            switch (msg.type) {
+                case 'error':
+                    showError(msg.message);
+                    break;
+
+                case 'joined':
+                    playerId = msg.player_id;
+                    showView('waiting');
+                    break;
+
+                case 'player_list':
+                    updatePlayerList(msg.players);
+                    break;
+
+                case 'question':
+                    showQuestion(msg);
+                    break;
+
+                case 'answer_confirmed':
+                    lockAnswer(msg.answer_index);
+                    break;
+
+                case 'answer_progress':
+                    updateAnswerProgress(msg);
+                    break;
+
+                case 'reveal':
+                    showResult(msg);
+                    break;
+
+                case 'game_over':
+                    showGameOver(msg);
+                    break;
+            }
+        }
+
+        function updatePlayerList(players) {
+            const list = document.getElementById('player-list');
+            list.innerHTML = players.map(p =>
+                `<li class="bg-gray-700 rounded p-2 ${p.id === playerId ? 'border-2 border-purple-500' : ''} ${p.connected === false ? 'opacity-60' : ''}">
+                    ${p.name} ${p.id === playerId ? '(you)' : ''} ${p.connected === false ? '(offline)' : ''}
+                </li>`
+            ).join('');
+        }
+
+        function showQuestion(msg) {
+            currentQuestion = msg;
+            selectedAnswer = null;
+
+            document.getElementById('question-num').textContent = msg.question_number;
+            document.getElementById('total-questions').textContent = msg.total_questions;
+            document.getElementById('question-text').textContent = msg.text;
+            updateAnswerProgress(msg);
+
+            msg.options.forEach((opt, i) => {
+                document.getElementById(`option-text-${i}`).textContent = opt;
+            });
+
+            // Reset buttons
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.classList.remove('selected', 'correct', 'incorrect', 'disabled');
+            });
+            document.getElementById('answer-status').classList.add('hidden');
+
+            showView('question');
+        }
+
+        function updateAnswerProgress(msg) {
+            if (msg.answered_count === undefined || msg.total_players === undefined) return;
+            document.getElementById('player-answer-count').textContent = msg.answered_count;
+            document.getElementById('player-total-players').textContent = msg.total_players;
+            document.getElementById('player-remaining-count').textContent = msg.remaining_count !== undefined
+                ? msg.remaining_count
+                : Math.max(0, msg.total_players - msg.answered_count);
+        }
+
+        function selectAnswer(index) {
+            if (selectedAnswer !== null) return;
+
+            selectedAnswer = index;
+
+            // Visual feedback
+            document.querySelectorAll('.option-btn').forEach((btn, i) => {
+                if (i === index) {
+                    btn.classList.add('selected');
+                }
+            });
+
+            // Send answer
+            ws.send(JSON.stringify({
+                type: 'answer',
+                answer_index: index
+            }));
+        }
+
+        function lockAnswer(index) {
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.classList.add('disabled');
+            });
+            document.getElementById('answer-status').classList.remove('hidden');
+        }
+
+        function showResult(msg) {
+            const myResult = msg.player_results.find(r => r.player_id === playerId);
+
+            document.getElementById('result-correct').classList.add('hidden');
+            document.getElementById('result-incorrect').classList.add('hidden');
+
+            if (myResult && myResult.correct) {
+                document.getElementById('result-correct').classList.remove('hidden');
+                document.getElementById('points-earned').textContent = `+${myResult.points_earned} points`;
+            } else {
+                document.getElementById('result-incorrect').classList.remove('hidden');
+                document.getElementById('correct-answer-text').textContent = msg.correct_answer;
+            }
+
+            // Update score
+            if (myResult) {
+                document.getElementById('current-score').textContent = `${myResult.total_score} pts`;
+            }
+
+            // Find rank
+            const myRank = msg.rankings.findIndex(r => r.id === playerId) + 1;
+            if (myRank > 0) {
+                document.getElementById('current-rank').textContent = `Rank: ${myRank} of ${msg.rankings.length}`;
+            }
+
+            showView('result');
+        }
+
+        function showGameOver(msg) {
+            const myRank = msg.final_rankings.find(r => r.id === playerId);
+
+            if (myRank) {
+                document.getElementById('final-score').textContent = `${myRank.score} pts`;
+                document.getElementById('final-rank').textContent = `#${myRank.rank} of ${msg.final_rankings.length}`;
+            }
+
+            const rankings = document.getElementById('final-rankings');
+            rankings.innerHTML = msg.final_rankings.map((p, i) => {
+                const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '';
+                const isMe = p.id === playerId;
+                return `<li class="bg-gray-700 rounded p-3 flex justify-between ${isMe ? 'border-2 border-purple-500' : ''} ${i === 0 ? 'bg-yellow-900' : ''}">
+                    <span>${medal} ${p.rank}. ${p.name} ${isMe ? '(you)' : ''}</span>
+                    <span class="font-bold">${p.score} pts</span>
+                </li>`;
+            }).join('');
+
+            showView('gameover');
+        }
+
+        function showView(view) {
+            joinView.classList.add('hidden');
+            waitingView.classList.add('hidden');
+            questionView.classList.add('hidden');
+            resultView.classList.add('hidden');
+            gameoverView.classList.add('hidden');
+
+            document.getElementById(`${view}-view`).classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>

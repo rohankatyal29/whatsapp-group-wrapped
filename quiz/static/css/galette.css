@@ -1,0 +1,241 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Cormorant+Garamond:wght@400;600;700&display=swap');
+
+:root {
+  --cream: #f8f2e6;
+  --almond: #f1e0c7;
+  --crust: #c48a3a;
+  --gold: #d9b469;
+  --deep: #3a2614;
+  --berry: #7b2f28;
+  --royal: #1f3b63;
+  --pine: #3e5a2f;
+  --shadow: rgba(58, 38, 20, 0.25);
+  --mist: rgba(255, 252, 244, 0.85);
+}
+
+.galette-body {
+  background:
+    radial-gradient(circle at 12% 8%, rgba(255, 255, 255, 0.7), transparent 45%),
+    radial-gradient(circle at 90% 12%, rgba(217, 180, 105, 0.35), transparent 50%),
+    linear-gradient(135deg, #f8f2e6 0%, #efe0c2 45%, #e6cca1 100%);
+  color: var(--deep);
+  font-family: "Cormorant Garamond", "Garamond", "Times New Roman", serif;
+  letter-spacing: 0.01em;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.galette-body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    repeating-linear-gradient(45deg, rgba(196, 138, 58, 0.08) 0, rgba(196, 138, 58, 0.08) 2px, transparent 2px, transparent 10px),
+    radial-gradient(circle at 20% 80%, rgba(123, 47, 40, 0.12), transparent 45%);
+  opacity: 0.7;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.galette-body::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 16px;
+  background: linear-gradient(90deg, #b48335, #e0c17e, #b48335);
+  opacity: 0.7;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.galette-shell {
+  background: var(--mist);
+  border: 1px solid #d7b56d;
+  border-radius: 26px;
+  box-shadow: 0 18px 38px var(--shadow);
+  backdrop-filter: blur(6px);
+  position: relative;
+  z-index: 1;
+}
+
+.galette-body h1 {
+  font-family: "Cinzel", "Cormorant Garamond", serif;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.galette-body h2,
+.galette-body h3 {
+  font-family: "Cinzel", "Cormorant Garamond", serif;
+  letter-spacing: 0.05em;
+}
+
+.galette-body p,
+.galette-body li,
+.galette-body span,
+.galette-body label,
+.galette-body input,
+.galette-body button {
+  font-family: "Cormorant Garamond", "Garamond", "Times New Roman", serif;
+}
+
+.galette-body .bg-gray-800 {
+  background: linear-gradient(135deg, rgba(255, 252, 244, 0.97), rgba(240, 224, 195, 0.92));
+  border: 1px solid #d7b56d;
+  box-shadow: 0 10px 22px var(--shadow);
+  color: var(--deep);
+}
+
+.galette-body .bg-gray-700 {
+  background: rgba(244, 232, 210, 0.92);
+  border: 1px dashed #cfa861;
+  color: var(--deep);
+}
+
+.galette-body .bg-yellow-900 {
+  background: rgba(210, 160, 80, 0.45);
+}
+
+.galette-body .text-gray-400,
+.galette-body .text-gray-500 {
+  color: #7a5b36;
+}
+
+.galette-body .text-purple-400 {
+  color: var(--royal);
+}
+
+.galette-body .text-blue-400 {
+  color: #2d5b91;
+}
+
+.galette-body .text-green-400 {
+  color: #376a3a;
+}
+
+.galette-body .text-red-400 {
+  color: #a04335;
+}
+
+.galette-body .text-yellow-400 {
+  color: #b6873a;
+}
+
+.galette-body .border-gray-600 {
+  border-color: #c59b59;
+}
+
+.galette-body input {
+  background: rgba(255, 252, 244, 0.95);
+  border: 1px solid #caa968;
+  color: var(--deep);
+  box-shadow: inset 0 1px 2px rgba(58, 38, 20, 0.15);
+}
+
+.galette-body input::placeholder {
+  color: #9b7b4e;
+}
+
+.galette-body button:not(.option-btn) {
+  background: linear-gradient(135deg, #e6c98a, #c99c4c);
+  color: var(--deep);
+  border: 1px solid #b48335;
+  box-shadow: 0 6px 16px var(--shadow);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.galette-body button:not(.option-btn):hover {
+  background: linear-gradient(135deg, #f0d59b, #d4a757);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 18px var(--shadow);
+}
+
+.galette-body button:not(.option-btn):active {
+  transform: translateY(1px);
+}
+
+.galette-body button:not(.option-btn):disabled {
+  background: #e9dcc2;
+  border-color: #d3c0a0;
+  color: #8b6a3f;
+  box-shadow: none;
+}
+
+.option-btn {
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 6px 14px var(--shadow);
+  letter-spacing: 0.02em;
+}
+
+.option-btn:active {
+  transform: scale(0.98);
+}
+
+.option-0 {
+  background: linear-gradient(135deg, #8b3a31, #6f271f);
+  color: #f9f1e2;
+}
+
+.option-1 {
+  background: linear-gradient(135deg, #2c4f87, #1d345c);
+  color: #f9f1e2;
+}
+
+.option-2 {
+  background: linear-gradient(135deg, #d6a353, #b48036);
+  color: #2f1b0e;
+}
+
+.option-3 {
+  background: linear-gradient(135deg, #3d6135, #2b4a27);
+  color: #f9f1e2;
+}
+
+.option-btn.selected {
+  box-shadow: inset 0 0 0 3px #f8f2e6, 0 8px 16px var(--shadow);
+}
+
+.option-btn.correct {
+  box-shadow: 0 0 0 4px #3c8d3d, 0 8px 18px rgba(60, 141, 61, 0.25);
+}
+
+.option-btn.incorrect {
+  opacity: 0.5;
+  filter: grayscale(0.2);
+}
+
+.option-btn.disabled {
+  pointer-events: none;
+}
+
+#join-view,
+#waiting-view,
+#question-view,
+#result-view,
+#gameover-view,
+#setup-view,
+#lobby-view,
+#reveal-view {
+  animation: riseIn 0.4s ease;
+}
+
+@keyframes riseIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

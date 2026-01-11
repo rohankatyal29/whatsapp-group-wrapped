@@ -3,33 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Play - WhatsApp Group Wrapped Quiz</title>
+    <title>Play - Galette des Rois Quiz</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/static/css/galette.css">
 </head>
 <body class="galette-body">
+    <!-- Crown SVG Definition -->
+    <svg style="display: none;">
+        <defs>
+            <linearGradient id="crown-gradient" x1="32" y1="8" x2="32" y2="46">
+                <stop offset="0%" stop-color="#f7e98e"/>
+                <stop offset="50%" stop-color="#d4af37"/>
+                <stop offset="100%" stop-color="#996515"/>
+            </linearGradient>
+        </defs>
+        <symbol id="crown-icon" viewBox="0 0 64 48">
+            <path d="M4 38L12 14L24 26L32 6L40 26L52 14L60 38H4Z"
+                  fill="url(#crown-gradient)"
+                  stroke="#996515"
+                  stroke-width="2"/>
+            <circle cx="12" cy="12" r="4" fill="#f7e98e"/>
+            <circle cx="32" cy="4" r="5" fill="#f7e98e"/>
+            <circle cx="52" cy="12" r="4" fill="#f7e98e"/>
+            <rect x="4" y="38" width="56" height="6" fill="#996515" rx="1"/>
+        </symbol>
+        <!-- Checkmark Icon -->
+        <symbol id="check-icon" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="11" fill="#2d936c" stroke="#1e6f4c" stroke-width="2"/>
+            <path d="M7 12.5L10.5 16L17 8" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </symbol>
+        <!-- Cross Icon -->
+        <symbol id="cross-icon" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="11" fill="#e63946" stroke="#c1121f" stroke-width="2"/>
+            <path d="M8 8L16 16M16 8L8 16" stroke="white" stroke-width="3" stroke-linecap="round" fill="none"/>
+        </symbol>
+    </svg>
+
     <div class="container mx-auto px-4 py-6 max-w-lg galette-shell">
         <!-- Join View -->
         <div id="join-view">
-            <h1 class="text-2xl font-bold text-center mb-8">Join Quiz</h1>
+            <div class="text-center mb-6">
+                <svg class="mx-auto mb-4" style="width: 60px; height: 45px;">
+                    <use href="#crown-icon"/>
+                </svg>
+                <h1 class="text-2xl font-bold">Join the Quest</h1>
+                <p class="text-gray-400 text-sm mt-2">Find the hidden feve and become the King!</p>
+            </div>
 
             <div class="space-y-4">
                 <div>
-                    <label class="block text-gray-400 mb-2">Game Code</label>
+                    <label class="block text-gray-400 mb-2 uppercase tracking-widest text-sm">Game Code</label>
                     <input type="text" id="game-code-input" maxlength="4"
-                        class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-2xl text-center uppercase tracking-widest"
-                        placeholder="ABCD">
+                        class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-4 text-2xl text-center uppercase tracking-widest"
+                        placeholder="XXXX"
+                        autocomplete="off"
+                        autocapitalize="characters">
                 </div>
 
                 <div>
-                    <label class="block text-gray-400 mb-2">Your Name</label>
+                    <label class="block text-gray-400 mb-2 uppercase tracking-widest text-sm">Your Name</label>
                     <input type="text" id="player-name-input" maxlength="20"
                         class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-xl"
-                        placeholder="Enter your name">
+                        placeholder="Enter your name"
+                        autocomplete="off">
                 </div>
 
                 <button id="join-btn" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 rounded-lg text-xl mt-4">
-                    Join Game
+                    Enter the Galette
                 </button>
 
                 <p id="error-msg" class="text-red-500 text-center hidden"></p>
@@ -38,88 +78,136 @@
 
         <!-- Waiting View -->
         <div id="waiting-view" class="hidden text-center">
-            <h1 class="text-2xl font-bold mb-4">You're In!</h1>
-            <p class="text-gray-400 mb-8">Waiting for the quiz master to start the game...</p>
+            <div class="mb-6">
+                <svg class="mx-auto mb-4 winner-crown" style="width: 70px; height: 52px;">
+                    <use href="#crown-icon"/>
+                </svg>
+                <h1 class="text-2xl font-bold mb-2">You're In!</h1>
+                <p class="text-gray-400">Waiting for the Quiz Master to start...</p>
+            </div>
 
             <div class="bg-gray-800 rounded-lg p-6">
-                <p class="text-gray-400 mb-2">Players</p>
+                <p class="text-gray-400 mb-3 uppercase tracking-widest text-sm">Players Ready</p>
                 <ul id="player-list" class="space-y-2"></ul>
             </div>
         </div>
 
         <!-- Question View -->
         <div id="question-view" class="hidden">
-            <div class="text-center mb-4">
-                <p class="text-gray-400">Question <span id="question-num">1</span> of <span id="total-questions">5</span></p>
+            <!-- Progress Bar -->
+            <div class="mb-4">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-gray-400 uppercase tracking-widest text-xs">Question</span>
+                    <span class="text-gray-400 text-sm">
+                        <span id="question-num" class="font-bold text-white">1</span>
+                        <span class="mx-1">/</span>
+                        <span id="total-questions">5</span>
+                    </span>
+                </div>
+                <div class="h-1 bg-gray-700 rounded-full overflow-hidden">
+                    <div id="progress-bar" class="h-full bg-gradient-to-r from-yellow-600 to-yellow-400 transition-all duration-300" style="width: 20%"></div>
+                </div>
             </div>
 
-            <div class="bg-gray-800 rounded-lg p-4 mb-6">
-                <h2 id="question-text" class="text-xl font-semibold text-center"></h2>
+            <div class="bg-gray-800 rounded-lg p-5 mb-5">
+                <h2 id="question-text" class="text-xl font-semibold text-center leading-relaxed"></h2>
             </div>
 
             <div class="grid grid-cols-1 gap-3" id="options-container">
                 <button class="option-btn option-0 rounded-lg text-lg font-semibold" data-index="0">
-                    <span class="mr-2 font-bold">A.</span> <span id="option-text-0"></span>
+                    <span class="option-letter w-10 h-10 rounded flex items-center justify-center font-bold text-xl mr-3 bg-black bg-opacity-30">A</span>
+                    <span id="option-text-0" class="flex-1 text-left"></span>
                 </button>
                 <button class="option-btn option-1 rounded-lg text-lg font-semibold" data-index="1">
-                    <span class="mr-2 font-bold">B.</span> <span id="option-text-1"></span>
+                    <span class="option-letter w-10 h-10 rounded flex items-center justify-center font-bold text-xl mr-3 bg-black bg-opacity-30">B</span>
+                    <span id="option-text-1" class="flex-1 text-left"></span>
                 </button>
                 <button class="option-btn option-2 rounded-lg text-lg font-semibold" data-index="2">
-                    <span class="mr-2 font-bold">C.</span> <span id="option-text-2"></span>
+                    <span class="option-letter w-10 h-10 rounded flex items-center justify-center font-bold text-xl mr-3 bg-black bg-opacity-30">C</span>
+                    <span id="option-text-2" class="flex-1 text-left"></span>
                 </button>
                 <button class="option-btn option-3 rounded-lg text-lg font-semibold" data-index="3">
-                    <span class="mr-2 font-bold">D.</span> <span id="option-text-3"></span>
+                    <span class="option-letter w-10 h-10 rounded flex items-center justify-center font-bold text-xl mr-3 bg-black bg-opacity-30">D</span>
+                    <span id="option-text-3" class="flex-1 text-left"></span>
                 </button>
             </div>
 
-            <div class="bg-gray-800 rounded-lg p-3 mt-4 text-center">
-                <p class="text-gray-400">Answer Progress</p>
-                <p class="text-lg">
-                    <span id="player-answer-count">0</span> / <span id="player-total-players">0</span>
-                    <span class="mx-2">•</span>
-                    Remaining: <span id="player-remaining-count">0</span>
+            <div class="bg-gray-800 rounded-lg p-3 mt-4">
+                <p class="text-center text-sm">
+                    <span class="text-gray-400">Answered:</span>
+                    <span id="player-answer-count" class="font-bold text-green-400 mx-1">0</span>
+                    <span class="text-gray-500">/</span>
+                    <span id="player-total-players" class="mx-1">0</span>
+                    <span class="text-gray-600 mx-2">|</span>
+                    <span class="text-gray-400">Waiting:</span>
+                    <span id="player-remaining-count" class="font-bold text-yellow-400 ml-1">0</span>
                 </p>
             </div>
 
             <div id="answer-status" class="text-center mt-6 hidden">
-                <p class="text-xl">Answer locked in!</p>
-                <p class="text-gray-400">Waiting for reveal...</p>
+                <div class="inline-flex items-center gap-2 px-4 py-2 bg-gray-800 rounded-lg">
+                    <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    <span class="text-lg">Answer locked in!</span>
+                </div>
+                <p class="text-gray-500 text-sm mt-2">Waiting for reveal...</p>
             </div>
         </div>
 
         <!-- Result View -->
         <div id="result-view" class="hidden text-center">
             <div id="result-correct" class="hidden">
-                <p class="text-6xl mb-4">✓</p>
-                <h2 class="text-3xl font-bold text-green-400 mb-2">Correct!</h2>
-                <p id="points-earned" class="text-xl text-gray-400">+150 points</p>
+                <div class="mb-6">
+                    <svg class="mx-auto" style="width: 80px; height: 80px;">
+                        <use href="#check-icon"/>
+                    </svg>
+                </div>
+                <h2 class="text-4xl font-bold text-green-400 mb-3">Correct!</h2>
+                <div class="inline-block px-6 py-3 bg-green-900 bg-opacity-30 rounded-lg border border-green-700">
+                    <p id="points-earned" class="text-2xl font-bold text-green-400">+150 pts</p>
+                </div>
             </div>
 
             <div id="result-incorrect" class="hidden">
-                <p class="text-6xl mb-4">✗</p>
-                <h2 class="text-3xl font-bold text-red-400 mb-2">Wrong!</h2>
-                <p id="correct-was" class="text-xl text-gray-400">The answer was: <span id="correct-answer-text"></span></p>
+                <div class="mb-6">
+                    <svg class="mx-auto" style="width: 80px; height: 80px;">
+                        <use href="#cross-icon"/>
+                    </svg>
+                </div>
+                <h2 class="text-4xl font-bold text-red-400 mb-3">Wrong!</h2>
+                <div class="bg-gray-800 rounded-lg p-4 inline-block">
+                    <p class="text-gray-400 text-sm uppercase tracking-widest mb-1">Correct Answer</p>
+                    <p id="correct-answer-text" class="text-xl font-semibold text-green-400"></p>
+                </div>
             </div>
 
             <div class="bg-gray-800 rounded-lg p-6 mt-8">
-                <p class="text-gray-400 mb-2">Your Score</p>
-                <p id="current-score" class="text-4xl font-bold"></p>
-                <p id="current-rank" class="text-gray-400 mt-2"></p>
+                <p class="text-gray-400 uppercase tracking-widest text-sm mb-2">Your Score</p>
+                <p id="current-score" class="text-5xl font-bold"></p>
+                <p id="current-rank" class="text-gray-400 mt-2 text-lg"></p>
             </div>
         </div>
 
         <!-- Game Over View -->
         <div id="gameover-view" class="hidden text-center">
-            <h1 class="text-3xl font-bold mb-8">Game Over!</h1>
+            <div class="winner-crown mb-4">
+                <svg class="mx-auto" style="width: 80px; height: 60px;">
+                    <use href="#crown-icon"/>
+                </svg>
+            </div>
+            <h1 class="text-3xl font-bold mb-6 uppercase tracking-widest">Game Over!</h1>
 
-            <div class="bg-gray-800 rounded-lg p-6 mb-6">
-                <p class="text-gray-400 mb-2">Your Final Score</p>
+            <div class="bg-gray-800 rounded-lg p-6 mb-6 next-panel-cube">
+                <p class="text-gray-400 uppercase tracking-widest text-sm mb-2">Your Final Score</p>
                 <p id="final-score" class="text-5xl font-bold text-purple-400"></p>
-                <p id="final-rank" class="text-xl text-gray-400 mt-2"></p>
+                <p id="final-rank" class="text-xl text-gray-400 mt-3"></p>
             </div>
 
             <div class="bg-gray-800 rounded-lg p-6">
-                <h3 class="text-xl font-semibold mb-4">Final Rankings</h3>
+                <h3 class="text-xl font-semibold mb-4 flex items-center justify-center gap-2 uppercase tracking-widest">
+                    <svg style="width: 24px; height: 18px;"><use href="#crown-icon"/></svg>
+                    <span>Final Rankings</span>
+                    <svg style="width: 24px; height: 18px;"><use href="#crown-icon"/></svg>
+                </h3>
                 <ol id="final-rankings" class="space-y-2 text-left"></ol>
             </div>
         </div>
@@ -132,6 +220,7 @@
         let gameCode = null;
         let selectedAnswer = null;
         let currentQuestion = null;
+        let totalQuestions = 5;
 
         // DOM Elements
         const joinView = document.getElementById('join-view');
@@ -149,6 +238,11 @@
         // Allow Enter key to submit
         document.getElementById('player-name-input').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') joinGame();
+        });
+        document.getElementById('game-code-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('player-name-input').focus();
+            }
         });
 
         // Option buttons
@@ -239,21 +333,35 @@
 
         function updatePlayerList(players) {
             const list = document.getElementById('player-list');
-            list.innerHTML = players.map(p =>
-                `<li class="bg-gray-700 rounded p-2 ${p.id === playerId ? 'border-2 border-purple-500' : ''} ${p.connected === false ? 'opacity-60' : ''}">
-                    ${p.name} ${p.id === playerId ? '(you)' : ''} ${p.connected === false ? '(offline)' : ''}
-                </li>`
-            ).join('');
+            list.innerHTML = players.map((p, i) => {
+                const isMe = p.id === playerId;
+                const statusIcon = p.connected === false
+                    ? '<span class="text-gray-500">offline</span>'
+                    : '<span class="text-green-400">ready</span>';
+                return `<li class="bg-gray-700 rounded p-3 flex justify-between items-center stagger-item ${isMe ? 'border-l-4 border-yellow-500' : ''} ${p.connected === false ? 'opacity-60' : ''}"
+                            style="animation-delay: ${i * 0.05}s">
+                    <div class="flex items-center gap-3">
+                        <span class="w-8 h-8 rounded ${isMe ? 'bg-yellow-600' : 'bg-gray-600'} flex items-center justify-center font-bold text-sm">${p.name.charAt(0).toUpperCase()}</span>
+                        <span class="${isMe ? 'font-bold' : ''}">${p.name}${isMe ? ' (you)' : ''}</span>
+                    </div>
+                    ${statusIcon}
+                </li>`;
+            }).join('');
         }
 
         function showQuestion(msg) {
             currentQuestion = msg;
             selectedAnswer = null;
+            totalQuestions = msg.total_questions || 5;
 
             document.getElementById('question-num').textContent = msg.question_number;
             document.getElementById('total-questions').textContent = msg.total_questions;
             document.getElementById('question-text').textContent = msg.text;
             updateAnswerProgress(msg);
+
+            // Update progress bar
+            const progressPercent = (msg.question_number / msg.total_questions) * 100;
+            document.getElementById('progress-bar').style.width = `${progressPercent}%`;
 
             msg.options.forEach((opt, i) => {
                 document.getElementById(`option-text-${i}`).textContent = opt;
@@ -311,7 +419,7 @@
 
             if (myResult && myResult.correct) {
                 document.getElementById('result-correct').classList.remove('hidden');
-                document.getElementById('points-earned').textContent = `+${myResult.points_earned} points`;
+                document.getElementById('points-earned').textContent = `+${myResult.points_earned} pts`;
             } else {
                 document.getElementById('result-incorrect').classList.remove('hidden');
                 document.getElementById('correct-answer-text').textContent = msg.correct_answer;
@@ -325,7 +433,8 @@
             // Find rank
             const myRank = msg.rankings.findIndex(r => r.id === playerId) + 1;
             if (myRank > 0) {
-                document.getElementById('current-rank').textContent = `Rank: ${myRank} of ${msg.rankings.length}`;
+                const suffix = myRank === 1 ? 'st' : myRank === 2 ? 'nd' : myRank === 3 ? 'rd' : 'th';
+                document.getElementById('current-rank').textContent = `${myRank}${suffix} of ${msg.rankings.length} players`;
             }
 
             showView('result');
@@ -336,16 +445,23 @@
 
             if (myRank) {
                 document.getElementById('final-score').textContent = `${myRank.score} pts`;
-                document.getElementById('final-rank').textContent = `#${myRank.rank} of ${msg.final_rankings.length}`;
+                const suffix = myRank.rank === 1 ? 'st' : myRank.rank === 2 ? 'nd' : myRank.rank === 3 ? 'rd' : 'th';
+                document.getElementById('final-rank').textContent = `${myRank.rank}${suffix} place of ${msg.final_rankings.length}`;
             }
 
             const rankings = document.getElementById('final-rankings');
             rankings.innerHTML = msg.final_rankings.map((p, i) => {
-                const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '';
                 const isMe = p.id === playerId;
-                return `<li class="bg-gray-700 rounded p-3 flex justify-between ${isMe ? 'border-2 border-purple-500' : ''} ${i === 0 ? 'bg-yellow-900' : ''}">
-                    <span>${medal} ${p.rank}. ${p.name} ${isMe ? '(you)' : ''}</span>
-                    <span class="font-bold">${p.score} pts</span>
+                const medal = i === 0 ? '<svg style="width: 24px; height: 18px; display: inline-block; vertical-align: middle;"><use href="#crown-icon"/></svg>' :
+                              i === 1 ? '<span class="text-gray-300 font-bold">2nd</span>' :
+                              i === 2 ? '<span class="text-orange-400 font-bold">3rd</span>' : '';
+                return `<li class="bg-gray-700 rounded p-4 flex justify-between items-center stagger-item ${isMe ? 'border-l-4 border-yellow-500' : ''} ${i === 0 ? 'bg-yellow-900 feve-found' : ''}"
+                            style="animation-delay: ${i * 0.08}s">
+                    <span class="flex items-center gap-3">
+                        ${medal}
+                        <span class="${i === 0 || isMe ? 'font-bold' : ''}">${p.rank}. ${p.name}${isMe ? ' (you)' : ''}</span>
+                    </span>
+                    <span class="font-bold ${i === 0 ? 'text-yellow-400' : ''}">${p.score} pts</span>
                 </li>`;
             }).join('');
 

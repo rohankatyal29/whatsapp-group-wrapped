@@ -180,6 +180,12 @@
 
             <!-- Stats Sidebar -->
             <aside id="stats-sidebar" class="hidden mt-8 lg:mt-0 lg:w-72 bg-gray-800 rounded-lg p-4">
+                <!-- Disconnect warning banner -->
+                <div id="disconnect-warning" class="hidden bg-yellow-500 text-black px-4 py-2 rounded-lg mb-4 font-semibold flex justify-between items-center">
+                    <span id="disconnect-text">Someone disconnected</span>
+                    <button onclick="dismissDisconnectWarning()" class="text-black/70 hover:text-black text-xl leading-none">&times;</button>
+                </div>
+
                 <div class="mb-6">
                     <p class="text-gray-400 text-sm uppercase tracking-widest">Group Score</p>
                     <p id="group-score" class="text-3xl font-bold mt-2">0 pts</p>
@@ -283,7 +289,22 @@
                     showGameOver(msg);
                     updateStatsPanel();
                     break;
+
+                case 'player_disconnected':
+                    showDisconnectWarning(msg.player_name);
+                    break;
             }
+        }
+
+        function showDisconnectWarning(playerName) {
+            const warning = document.getElementById('disconnect-warning');
+            const text = document.getElementById('disconnect-text');
+            text.textContent = `${playerName} disconnected`;
+            warning.classList.remove('hidden');
+        }
+
+        function dismissDisconnectWarning() {
+            document.getElementById('disconnect-warning').classList.add('hidden');
         }
 
         function updatePlayerList(players) {

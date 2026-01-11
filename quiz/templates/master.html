@@ -3,19 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Master - WhatsApp Group Wrapped</title>
+    <title>Quiz Master - Galette des Rois</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/static/css/galette.css">
 </head>
 <body class="galette-body">
+    <!-- Crown SVG Definition -->
+    <svg style="display: none;">
+        <defs>
+            <linearGradient id="crown-gradient" x1="32" y1="8" x2="32" y2="46">
+                <stop offset="0%" stop-color="#f7e98e"/>
+                <stop offset="50%" stop-color="#d4af37"/>
+                <stop offset="100%" stop-color="#996515"/>
+            </linearGradient>
+        </defs>
+        <symbol id="crown-icon" viewBox="0 0 64 48">
+            <path d="M4 38L12 14L24 26L32 6L40 26L52 14L60 38H4Z"
+                  fill="url(#crown-gradient)"
+                  stroke="#996515"
+                  stroke-width="2"/>
+            <circle cx="12" cy="12" r="4" fill="#f7e98e"/>
+            <circle cx="32" cy="4" r="5" fill="#f7e98e"/>
+            <circle cx="52" cy="12" r="4" fill="#f7e98e"/>
+            <rect x="4" y="38" width="56" height="6" fill="#996515" rx="1"/>
+        </symbol>
+    </svg>
+
     <div class="container mx-auto px-4 py-8 max-w-4xl galette-shell">
         <div class="lg:flex lg:gap-6">
             <div class="flex-1">
-                <h1 class="text-3xl font-bold text-center mb-8">WhatsApp Group Wrapped Quiz</h1>
+                <!-- Header with Crown -->
+                <div class="flex items-center justify-center gap-4 mb-8">
+                    <svg class="crown-icon-small hidden sm:block" style="width: 40px; height: 30px;">
+                        <use href="#crown-icon"/>
+                    </svg>
+                    <h1 class="text-2xl sm:text-3xl font-bold text-center">Galette des Rois Quiz</h1>
+                    <svg class="crown-icon-small hidden sm:block" style="width: 40px; height: 30px;">
+                        <use href="#crown-icon"/>
+                    </svg>
+                </div>
 
                 <!-- Setup View -->
                 <div id="setup-view" class="text-center">
-                    <p class="text-xl mb-8">Create a new quiz game for your friends!</p>
+                    <div class="mb-8">
+                        <svg class="mx-auto mb-6 winner-crown" style="width: 80px; height: 60px;">
+                            <use href="#crown-icon"/>
+                        </svg>
+                        <p class="text-xl mb-2 text-gray-400">Who will find the feve?</p>
+                        <p class="text-lg text-gray-500">Create a quiz game and crown your champion</p>
+                    </div>
                     <button id="create-game-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-8 rounded-lg text-xl">
                         Create Game
                     </button>
@@ -23,21 +59,24 @@
 
                 <!-- Lobby View -->
                 <div id="lobby-view" class="hidden">
-                    <div class="bg-gray-800 rounded-lg p-6 mb-6">
+                    <div class="bg-gray-800 rounded-lg p-6 mb-6 next-panel-cube">
                         <div class="text-center mb-6">
-                            <p class="text-gray-400 mb-2">Game Code</p>
+                            <p class="text-gray-400 mb-2 uppercase tracking-widest text-sm">Game Code</p>
                             <p id="game-code" class="text-5xl font-bold tracking-widest text-purple-400"></p>
                         </div>
-                        <div class="text-center mb-6">
-                            <p class="text-gray-400 mb-2">Players join at</p>
-                            <p id="join-url" class="text-xl text-blue-400 break-all"></p>
+                        <div class="text-center mb-2">
+                            <p class="text-gray-400 mb-2 uppercase tracking-widest text-sm">Players join at</p>
+                            <p id="join-url" class="text-xl text-blue-400 break-all font-mono"></p>
                         </div>
                     </div>
 
                     <div class="bg-gray-800 rounded-lg p-6 mb-6">
-                        <h2 class="text-xl font-semibold mb-4">Players (<span id="player-count">0</span>)</h2>
+                        <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                            <span>Players</span>
+                            <span class="text-gray-400">(<span id="player-count">0</span>)</span>
+                        </h2>
                         <ul id="player-list" class="space-y-2"></ul>
-                        <p id="no-players" class="text-gray-500 italic">Waiting for players to join...</p>
+                        <p id="no-players" class="text-gray-500 italic text-center py-4">Waiting for players to join...</p>
                     </div>
 
                     <button id="start-game-btn" class="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-4 px-8 rounded-lg text-xl" disabled>
@@ -48,30 +87,36 @@
                 <!-- Question View -->
                 <div id="question-view" class="hidden">
                     <div class="bg-gray-800 rounded-lg p-6 mb-6">
-                        <p class="text-gray-400 text-center mb-2">Question <span id="question-num">1</span> of <span id="total-questions">5</span></p>
+                        <p class="text-gray-400 text-center mb-2 uppercase tracking-widest text-sm">
+                            Question <span id="question-num">1</span> of <span id="total-questions">5</span>
+                        </p>
                         <h2 id="question-text" class="text-xl sm:text-2xl font-semibold text-center mb-6 leading-relaxed question-text"></h2>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                             <div class="option-btn option-0 rounded-lg p-3 sm:p-4">
-                                <span class="font-bold shrink-0">A.</span> <span id="option-0"></span>
+                                <span class="font-bold mr-2 shrink-0">A.</span><span id="option-0"></span>
                             </div>
                             <div class="option-btn option-1 rounded-lg p-3 sm:p-4">
-                                <span class="font-bold shrink-0">B.</span> <span id="option-1"></span>
+                                <span class="font-bold mr-2 shrink-0">B.</span><span id="option-1"></span>
                             </div>
                             <div class="option-btn option-2 rounded-lg p-3 sm:p-4">
-                                <span class="font-bold shrink-0">C.</span> <span id="option-2"></span>
+                                <span class="font-bold mr-2 shrink-0">C.</span><span id="option-2"></span>
                             </div>
                             <div class="option-btn option-3 rounded-lg p-3 sm:p-4">
-                                <span class="font-bold shrink-0">D.</span> <span id="option-3"></span>
+                                <span class="font-bold mr-2 shrink-0">D.</span><span id="option-3"></span>
                             </div>
                         </div>
                     </div>
 
                     <div class="bg-gray-800 rounded-lg p-4 mb-6">
                         <p class="text-center text-lg">
-                            Answers: <span id="answer-count">0</span> / <span id="total-players">0</span>
-                            <span class="mx-2">•</span>
-                            Remaining: <span id="remaining-count">0</span>
+                            <span class="text-gray-400">Answers:</span>
+                            <span id="answer-count" class="font-bold text-green-400">0</span>
+                            <span class="text-gray-500">/</span>
+                            <span id="total-players">0</span>
+                            <span class="mx-3 text-gray-600">|</span>
+                            <span class="text-gray-400">Waiting:</span>
+                            <span id="remaining-count" class="font-bold text-yellow-400">0</span>
                         </p>
                     </div>
 
@@ -83,18 +128,25 @@
                 <!-- Reveal View -->
                 <div id="reveal-view" class="hidden">
                     <div class="bg-gray-800 rounded-lg p-6 mb-6">
-                        <p class="text-gray-400 text-center mb-2">Question <span id="reveal-question-num">1</span> of <span id="reveal-total-questions">5</span></p>
+                        <p class="text-gray-400 text-center mb-2 uppercase tracking-widest text-sm">
+                            Question <span id="reveal-question-num">1</span> of <span id="reveal-total-questions">5</span>
+                        </p>
                         <h2 id="reveal-question-text" class="text-xl sm:text-2xl font-semibold text-center mb-6 leading-relaxed question-text"></h2>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6" id="reveal-options"></div>
 
-                        <p class="text-center text-xl">
-                            Correct Answer: <span id="correct-answer" class="text-green-400 font-bold"></span>
-                        </p>
+                        <div class="text-center py-4 border-t border-gray-700">
+                            <p class="text-gray-400 uppercase tracking-widest text-sm mb-2">Correct Answer</p>
+                            <p id="correct-answer" class="text-green-400 font-bold text-2xl"></p>
+                        </div>
                     </div>
 
                     <div class="bg-gray-800 rounded-lg p-6 mb-6">
-                        <h3 class="text-xl font-semibold mb-4 text-center">Leaderboard</h3>
+                        <h3 class="text-xl font-semibold mb-4 text-center flex items-center justify-center gap-2">
+                            <svg style="width: 24px; height: 18px;"><use href="#crown-icon"/></svg>
+                            <span>Leaderboard</span>
+                            <svg style="width: 24px; height: 18px;"><use href="#crown-icon"/></svg>
+                        </h3>
                         <ol id="leaderboard" class="space-y-2"></ol>
                     </div>
 
@@ -106,25 +158,42 @@
                 <!-- Game Over View -->
                 <div id="gameover-view" class="hidden">
                     <div class="bg-gray-800 rounded-lg p-8 text-center mb-6">
-                        <h2 class="text-3xl font-bold mb-4">Game Over!</h2>
-                        <p class="text-xl mb-2">Winner</p>
-                        <p id="winner-name" class="text-4xl font-bold text-yellow-400 mb-8"></p>
+                        <div class="winner-crown mb-4">
+                            <svg class="mx-auto" style="width: 100px; height: 75px;">
+                                <use href="#crown-icon"/>
+                            </svg>
+                        </div>
+                        <h2 class="text-3xl font-bold mb-2 uppercase tracking-widest">The King</h2>
+                        <p class="text-gray-400 mb-4 text-sm">Found the Feve!</p>
+                        <p id="winner-name" class="text-5xl font-bold mb-4"></p>
+                        <div class="inline-block px-4 py-2 bg-yellow-900 rounded-lg feve-found">
+                            <span class="text-crown-gold">Champion of the Galette</span>
+                        </div>
                     </div>
 
                     <div class="bg-gray-800 rounded-lg p-6">
-                        <h3 class="text-xl font-semibold mb-4 text-center">Final Rankings</h3>
+                        <h3 class="text-xl font-semibold mb-4 text-center uppercase tracking-widest">Final Rankings</h3>
                         <ol id="final-rankings" class="space-y-2"></ol>
                     </div>
                 </div>
             </div>
 
+            <!-- Stats Sidebar -->
             <aside id="stats-sidebar" class="hidden mt-8 lg:mt-0 lg:w-72 bg-gray-800 rounded-lg p-4">
-                <p class="text-gray-400 text-sm uppercase tracking-widest">Group Score</p>
-                <p id="group-score" class="text-3xl font-bold mt-2">0 pts</p>
+                <!-- Disconnect warning banner -->
+                <div id="disconnect-warning" class="hidden bg-yellow-500 text-black px-4 py-2 rounded-lg mb-4 font-semibold flex justify-between items-center">
+                    <span id="disconnect-text">Someone disconnected</span>
+                    <button onclick="dismissDisconnectWarning()" class="text-black/70 hover:text-black text-xl leading-none">&times;</button>
+                </div>
 
-                <div class="mt-6">
-                    <p class="text-gray-400 text-sm uppercase tracking-widest mb-2">Last Question Times</p>
-                    <ul id="player-timing-list" class="space-y-2"></ul>
+                <div class="mb-6">
+                    <p class="text-gray-400 text-sm uppercase tracking-widest">Group Score</p>
+                    <p id="group-score" class="text-3xl font-bold mt-2">0 pts</p>
+                </div>
+
+                <div>
+                    <p class="text-gray-400 text-sm uppercase tracking-widest mb-3">Player Stats</p>
+                    <ul id="player-timing-list" class="space-y-2 hide-scrollbar max-h-96 overflow-y-auto"></ul>
                 </div>
             </aside>
         </div>
@@ -220,7 +289,22 @@
                     showGameOver(msg);
                     updateStatsPanel();
                     break;
+
+                case 'player_disconnected':
+                    showDisconnectWarning(msg.player_name);
+                    break;
             }
+        }
+
+        function showDisconnectWarning(playerName) {
+            const warning = document.getElementById('disconnect-warning');
+            const text = document.getElementById('disconnect-text');
+            text.textContent = `${playerName} disconnected`;
+            warning.classList.remove('hidden');
+        }
+
+        function dismissDisconnectWarning() {
+            document.getElementById('disconnect-warning').classList.add('hidden');
         }
 
         function updatePlayerList(players) {
@@ -238,10 +322,14 @@
             } else {
                 noPlayers.classList.add('hidden');
                 startBtn.disabled = connectedPlayers.length === 0;
-                list.innerHTML = players.map(p =>
-                    `<li class="bg-gray-700 rounded p-3 flex justify-between ${p.connected === false ? 'opacity-60' : ''}">
-                        <span>${p.name}${p.connected === false ? ' (offline)' : ''}</span>
-                        <span class="text-gray-400">${p.score} pts</span>
+                list.innerHTML = players.map((p, i) =>
+                    `<li class="bg-gray-700 rounded p-3 flex justify-between items-center stagger-item ${p.connected === false ? 'opacity-60' : ''}"
+                         style="animation-delay: ${i * 0.05}s">
+                        <div class="flex items-center gap-3">
+                            <span class="w-8 h-8 rounded bg-gray-600 flex items-center justify-center font-bold text-sm">${p.name.charAt(0).toUpperCase()}</span>
+                            <span>${p.name}${p.connected === false ? ' <span class="text-gray-500 text-sm">(offline)</span>' : ''}</span>
+                        </div>
+                        <span class="text-gray-400 font-mono">${p.score} pts</span>
                     </li>`
                 ).join('');
             }
@@ -273,10 +361,10 @@
                 return (a.name || '').localeCompare(b.name || '');
             });
 
-            list.innerHTML = sortedPlayers.map(p => {
+            list.innerHTML = sortedPlayers.map((p, i) => {
                 const lastTime = p.last_answer_time !== null && p.last_answer_time !== undefined
                     ? `${p.last_answer_time.toFixed(2)}s`
-                    : '—';
+                    : '--';
                 const lastQ = p.last_answer_question_index !== null && p.last_answer_question_index !== undefined
                     ? `Q${p.last_answer_question_index + 1}`
                     : '';
@@ -284,17 +372,25 @@
                 const status = p.connected === false
                     ? 'Offline'
                     : (p.has_answered ? 'Answered' : 'Waiting');
+                const statusColor = p.connected === false
+                    ? 'text-gray-500'
+                    : (p.has_answered ? 'text-green-400' : 'text-yellow-400');
+                const medal = i === 0 ? '<span class="text-yellow-400">1st</span>' :
+                              i === 1 ? '<span class="text-gray-400">2nd</span>' :
+                              i === 2 ? '<span class="text-orange-400">3rd</span>' :
+                              `<span class="text-gray-500">${i + 1}th</span>`;
 
-                return `<li class="bg-gray-700 rounded p-2">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="font-semibold">${p.name}</p>
-                            <p class="text-gray-400 text-xs">Score: ${p.score} • ${status}</p>
+                return `<li class="bg-gray-700 rounded p-3 stagger-item" style="animation-delay: ${i * 0.05}s">
+                    <div class="flex items-center justify-between mb-1">
+                        <div class="flex items-center gap-2">
+                            ${medal}
+                            <span class="font-semibold">${p.name}</span>
                         </div>
-                        <div class="text-right">
-                            <p class="font-bold">${lastTime}</p>
-                            <p class="text-gray-400 text-xs">${isCurrent ? 'This question' : lastQ}</p>
-                        </div>
+                        <span class="font-bold text-crown-gold">${p.score} pts</span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="${statusColor}">${status}</span>
+                        <span class="text-gray-500">${isCurrent ? 'This Q' : lastQ} ${lastTime}</span>
                     </div>
                 </li>`;
             }).join('');
@@ -334,20 +430,23 @@
             // Show options with correct highlighted
             const optionsHtml = currentQuestion.options.map((opt, i) => {
                 const isCorrect = i === msg.correct_index;
-                return `<div class="option-btn option-${i} rounded-lg p-3 sm:p-4 ${isCorrect ? 'correct' : 'opacity-50'}">
-                    <span class="font-bold shrink-0">${['A', 'B', 'C', 'D'][i]}.</span> ${opt}
+                return `<div class="option-btn option-${i} rounded-lg p-3 sm:p-4 ${isCorrect ? 'correct' : 'opacity-40'}">
+                    <span class="font-bold mr-2 shrink-0">${['A', 'B', 'C', 'D'][i]}.</span>${opt}
                 </div>`;
             }).join('');
             document.getElementById('reveal-options').innerHTML = optionsHtml;
 
             // Update leaderboard
             const leaderboard = document.getElementById('leaderboard');
-            leaderboard.innerHTML = msg.rankings.map((p, i) =>
-                `<li class="bg-gray-700 rounded p-3 flex justify-between">
-                    <span>${i + 1}. ${p.name}</span>
-                    <span class="font-bold">${p.score} pts</span>
-                </li>`
-            ).join('');
+            leaderboard.innerHTML = msg.rankings.map((p, i) => {
+                const medal = i === 0 ? '<svg style="width: 20px; height: 15px; display: inline-block; vertical-align: middle;"><use href="#crown-icon"/></svg>' :
+                              i === 1 ? '<span class="text-gray-300">2nd</span>' :
+                              i === 2 ? '<span class="text-orange-400">3rd</span>' : '';
+                return `<li class="bg-gray-700 rounded p-3 flex justify-between items-center stagger-item" style="animation-delay: ${i * 0.05}s">
+                    <span class="flex items-center gap-2">${medal} <span class="${i === 0 ? 'font-bold' : ''}">${i + 1}. ${p.name}</span></span>
+                    <span class="font-bold ${i === 0 ? 'text-yellow-400' : ''}">${p.score} pts</span>
+                </li>`;
+            }).join('');
 
             showView('reveal');
         }
@@ -357,10 +456,16 @@
 
             const rankings = document.getElementById('final-rankings');
             rankings.innerHTML = msg.final_rankings.map((p, i) => {
-                const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '';
-                return `<li class="bg-gray-700 rounded p-4 flex justify-between items-center ${i === 0 ? 'bg-yellow-900' : ''}">
-                    <span class="text-xl">${medal} ${p.rank}. ${p.name}</span>
-                    <span class="font-bold text-xl">${p.score} pts</span>
+                const medal = i === 0 ? '<svg style="width: 28px; height: 21px; display: inline-block; vertical-align: middle;"><use href="#crown-icon"/></svg>' :
+                              i === 1 ? '<span class="text-2xl">2nd</span>' :
+                              i === 2 ? '<span class="text-2xl text-orange-400">3rd</span>' : '';
+                return `<li class="bg-gray-700 rounded p-4 flex justify-between items-center stagger-item ${i === 0 ? 'bg-yellow-900 feve-found' : ''}"
+                            style="animation-delay: ${i * 0.08}s">
+                    <span class="flex items-center gap-3 text-xl">
+                        ${medal}
+                        <span class="${i === 0 ? 'font-bold' : ''}">${p.rank}. ${p.name}</span>
+                    </span>
+                    <span class="font-bold text-xl ${i === 0 ? 'text-yellow-400' : ''}">${p.score} pts</span>
                 </li>`;
             }).join('');
 

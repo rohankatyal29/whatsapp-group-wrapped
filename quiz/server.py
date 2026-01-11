@@ -677,4 +677,12 @@ async def player_websocket(websocket: WebSocket, game_code: str, player_name: st
                 "phase": game.phase.value,
             })
             await save_state()
+            # Notify master about the disconnection
+            if game.code in quiz_master_connections:
+                master_ws = quiz_master_connections[game.code]
+                await master_ws.send_json({
+                    "type": "player_disconnected",
+                    "player_name": player.name,
+                    "player_id": player_id,
+                })
             await broadcast_player_list(game)

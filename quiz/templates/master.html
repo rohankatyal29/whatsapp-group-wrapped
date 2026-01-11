@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Master - WhatsApp Group Wrapped</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/css/galette.css">
+</head>
+<body class="galette-body">
+    <div class="container mx-auto px-4 py-8 max-w-4xl galette-shell">
+        <div class="lg:flex lg:gap-6">
+            <div class="flex-1">
+                <h1 class="text-3xl font-bold text-center mb-8">WhatsApp Group Wrapped Quiz</h1>
+
+                <!-- Setup View -->
+                <div id="setup-view" class="text-center">
+                    <p class="text-xl mb-8">Create a new quiz game for your friends!</p>
+                    <button id="create-game-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-8 rounded-lg text-xl">
+                        Create Game
+                    </button>
+                </div>
+
+                <!-- Lobby View -->
+                <div id="lobby-view" class="hidden">
+                    <div class="bg-gray-800 rounded-lg p-6 mb-6">
+                        <div class="text-center mb-6">
+                            <p class="text-gray-400 mb-2">Game Code</p>
+                            <p id="game-code" class="text-5xl font-bold tracking-widest text-purple-400"></p>
+                        </div>
+                        <div class="text-center mb-6">
+                            <p class="text-gray-400 mb-2">Players join at</p>
+                            <p id="join-url" class="text-xl text-blue-400 break-all"></p>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-800 rounded-lg p-6 mb-6">
+                        <h2 class="text-xl font-semibold mb-4">Players (<span id="player-count">0</span>)</h2>
+                        <ul id="player-list" class="space-y-2"></ul>
+                        <p id="no-players" class="text-gray-500 italic">Waiting for players to join...</p>
+                    </div>
+
+                    <button id="start-game-btn" class="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-4 px-8 rounded-lg text-xl" disabled>
+                        Start Game
+                    </button>
+                </div>
+
+                <!-- Question View -->
+                <div id="question-view" class="hidden">
+                    <div class="bg-gray-800 rounded-lg p-6 mb-6">
+                        <p class="text-gray-400 text-center mb-2">Question <span id="question-num">1</span> of <span id="total-questions">5</span></p>
+                        <h2 id="question-text" class="text-2xl font-semibold text-center mb-6"></h2>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="option-btn option-0 rounded-lg p-4 text-center">
+                                <span class="font-bold">A.</span> <span id="option-0"></span>
+                            </div>
+                            <div class="option-btn option-1 rounded-lg p-4 text-center">
+                                <span class="font-bold">B.</span> <span id="option-1"></span>
+                            </div>
+                            <div class="option-btn option-2 rounded-lg p-4 text-center">
+                                <span class="font-bold">C.</span> <span id="option-2"></span>
+                            </div>
+                            <div class="option-btn option-3 rounded-lg p-4 text-center">
+                                <span class="font-bold">D.</span> <span id="option-3"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-800 rounded-lg p-4 mb-6">
+                        <p class="text-center text-lg">
+                            Answers: <span id="answer-count">0</span> / <span id="total-players">0</span>
+                            <span class="mx-2">•</span>
+                            Remaining: <span id="remaining-count">0</span>
+                        </p>
+                    </div>
+
+                    <button id="reveal-btn" class="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-4 px-8 rounded-lg text-xl">
+                        Reveal Answer
+                    </button>
+                </div>
+
+                <!-- Reveal View -->
+                <div id="reveal-view" class="hidden">
+                    <div class="bg-gray-800 rounded-lg p-6 mb-6">
+                        <p class="text-gray-400 text-center mb-2">Question <span id="reveal-question-num">1</span> of <span id="reveal-total-questions">5</span></p>
+                        <h2 id="reveal-question-text" class="text-2xl font-semibold text-center mb-6"></h2>
+
+                        <div class="grid grid-cols-2 gap-4 mb-6" id="reveal-options"></div>
+
+                        <p class="text-center text-xl">
+                            Correct Answer: <span id="correct-answer" class="text-green-400 font-bold"></span>
+                        </p>
+                    </div>
+
+                    <div class="bg-gray-800 rounded-lg p-6 mb-6">
+                        <h3 class="text-xl font-semibold mb-4 text-center">Leaderboard</h3>
+                        <ol id="leaderboard" class="space-y-2"></ol>
+                    </div>
+
+                    <button id="next-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-lg text-xl">
+                        Next Question
+                    </button>
+                </div>
+
+                <!-- Game Over View -->
+                <div id="gameover-view" class="hidden">
+                    <div class="bg-gray-800 rounded-lg p-8 text-center mb-6">
+                        <h2 class="text-3xl font-bold mb-4">Game Over!</h2>
+                        <p class="text-xl mb-2">Winner</p>
+                        <p id="winner-name" class="text-4xl font-bold text-yellow-400 mb-8"></p>
+                    </div>
+
+                    <div class="bg-gray-800 rounded-lg p-6">
+                        <h3 class="text-xl font-semibold mb-4 text-center">Final Rankings</h3>
+                        <ol id="final-rankings" class="space-y-2"></ol>
+                    </div>
+                </div>
+            </div>
+
+            <aside id="stats-sidebar" class="hidden mt-8 lg:mt-0 lg:w-72 bg-gray-800 rounded-lg p-4">
+                <p class="text-gray-400 text-sm uppercase tracking-widest">Group Score</p>
+                <p id="group-score" class="text-3xl font-bold mt-2">0 pts</p>
+
+                <div class="mt-6">
+                    <p class="text-gray-400 text-sm uppercase tracking-widest mb-2">Last Question Times</p>
+                    <ul id="player-timing-list" class="space-y-2"></ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        let ws = null;
+        let gameCode = null;
+        let currentQuestion = null;
+        let currentQuestionIndex = null;
+        let latestPlayers = [];
+
+        // DOM Elements
+        const setupView = document.getElementById('setup-view');
+        const lobbyView = document.getElementById('lobby-view');
+        const questionView = document.getElementById('question-view');
+        const revealView = document.getElementById('reveal-view');
+        const gameoverView = document.getElementById('gameover-view');
+
+        // Setup
+        document.getElementById('create-game-btn').addEventListener('click', createGame);
+        document.getElementById('start-game-btn').addEventListener('click', () => sendMessage({ type: 'start_game' }));
+        document.getElementById('reveal-btn').addEventListener('click', () => sendMessage({ type: 'reveal_answer' }));
+        document.getElementById('next-btn').addEventListener('click', () => sendMessage({ type: 'next_question' }));
+
+        async function createGame() {
+            const response = await fetch('/api/create-game', { method: 'POST' });
+            const data = await response.json();
+            gameCode = data.code;
+
+            document.getElementById('game-code').textContent = gameCode;
+            document.getElementById('join-url').textContent = `http://${data.local_ip}:8000/play`;
+
+            showView('lobby');
+            connectWebSocket();
+        }
+
+        function connectWebSocket() {
+            ws = new WebSocket(`ws://${window.location.host}/ws/master/${gameCode}`);
+
+            ws.onmessage = (event) => {
+                const msg = JSON.parse(event.data);
+                handleMessage(msg);
+            };
+
+            ws.onclose = () => {
+                console.log('WebSocket closed');
+            };
+        }
+
+        function sendMessage(msg) {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify(msg));
+            }
+        }
+
+        function handleMessage(msg) {
+            switch (msg.type) {
+                case 'game_state':
+                    updatePlayerList(msg.players);
+                    updateStatsPanel(msg.players);
+                    currentQuestionIndex = msg.current_question_index ?? null;
+                    document.getElementById('total-questions').textContent = msg.question_count;
+                    document.getElementById('reveal-total-questions').textContent = msg.question_count;
+                    break;
+
+                case 'player_list':
+                    updatePlayerList(msg.players);
+                    updateStatsPanel(msg.players);
+                    break;
+
+                case 'question':
+                    showQuestion(msg);
+                    break;
+
+                case 'answer_received':
+                    document.getElementById('answer-count').textContent = msg.answered_count;
+                    document.getElementById('total-players').textContent = msg.total_players;
+                    document.getElementById('remaining-count').textContent = msg.remaining_count;
+                    if (msg.players) {
+                        updateStatsPanel(msg.players);
+                    } else {
+                        updateStatsPanel();
+                    }
+                    break;
+
+                case 'reveal':
+                    showReveal(msg);
+                    updateStatsPanel();
+                    break;
+
+                case 'game_over':
+                    showGameOver(msg);
+                    updateStatsPanel();
+                    break;
+            }
+        }
+
+        function updatePlayerList(players) {
+            const list = document.getElementById('player-list');
+            const noPlayers = document.getElementById('no-players');
+            const startBtn = document.getElementById('start-game-btn');
+            const connectedPlayers = players.filter(p => p.connected !== false);
+
+            document.getElementById('player-count').textContent = players.length;
+
+            if (players.length === 0) {
+                list.innerHTML = '';
+                noPlayers.classList.remove('hidden');
+                startBtn.disabled = true;
+            } else {
+                noPlayers.classList.add('hidden');
+                startBtn.disabled = connectedPlayers.length === 0;
+                list.innerHTML = players.map(p =>
+                    `<li class="bg-gray-700 rounded p-3 flex justify-between ${p.connected === false ? 'opacity-60' : ''}">
+                        <span>${p.name}${p.connected === false ? ' (offline)' : ''}</span>
+                        <span class="text-gray-400">${p.score} pts</span>
+                    </li>`
+                ).join('');
+            }
+        }
+
+        function updateStatsPanel(players) {
+            if (players) {
+                latestPlayers = players;
+            }
+
+            const sidebar = document.getElementById('stats-sidebar');
+            if (!sidebar) return;
+
+            const groupScore = latestPlayers.reduce((sum, p) => sum + (p.score || 0), 0);
+            const groupScoreEl = document.getElementById('group-score');
+            if (groupScoreEl) {
+                groupScoreEl.textContent = `${groupScore} pts`;
+            }
+
+            const list = document.getElementById('player-timing-list');
+            if (!list) return;
+
+            const sortedPlayers = [...latestPlayers].sort((a, b) => {
+                const scoreDiff = (b.score || 0) - (a.score || 0);
+                if (scoreDiff !== 0) return scoreDiff;
+                const aTime = a.avg_answer_time !== null && a.avg_answer_time !== undefined ? a.avg_answer_time : Infinity;
+                const bTime = b.avg_answer_time !== null && b.avg_answer_time !== undefined ? b.avg_answer_time : Infinity;
+                if (aTime !== bTime) return aTime - bTime;
+                return (a.name || '').localeCompare(b.name || '');
+            });
+
+            list.innerHTML = sortedPlayers.map(p => {
+                const lastTime = p.last_answer_time !== null && p.last_answer_time !== undefined
+                    ? `${p.last_answer_time.toFixed(2)}s`
+                    : '—';
+                const lastQ = p.last_answer_question_index !== null && p.last_answer_question_index !== undefined
+                    ? `Q${p.last_answer_question_index + 1}`
+                    : '';
+                const isCurrent = currentQuestionIndex !== null && p.last_answer_question_index === currentQuestionIndex;
+                const status = p.connected === false
+                    ? 'Offline'
+                    : (p.has_answered ? 'Answered' : 'Waiting');
+
+                return `<li class="bg-gray-700 rounded p-2">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-semibold">${p.name}</p>
+                            <p class="text-gray-400 text-xs">Score: ${p.score} • ${status}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-bold">${lastTime}</p>
+                            <p class="text-gray-400 text-xs">${isCurrent ? 'This question' : lastQ}</p>
+                        </div>
+                    </div>
+                </li>`;
+            }).join('');
+        }
+
+        function showQuestion(msg) {
+            currentQuestion = msg;
+            if (msg.question_index !== undefined) {
+                currentQuestionIndex = msg.question_index;
+            } else {
+                currentQuestionIndex = msg.question_number - 1;
+            }
+            document.getElementById('question-num').textContent = msg.question_number;
+            document.getElementById('question-text').textContent = msg.text;
+            document.getElementById('answer-count').textContent = msg.answered_count !== undefined ? msg.answered_count : '0';
+            document.getElementById('total-players').textContent = msg.total_players !== undefined ? msg.total_players : '0';
+            document.getElementById('remaining-count').textContent = msg.remaining_count !== undefined ? msg.remaining_count : '0';
+
+            msg.options.forEach((opt, i) => {
+                document.getElementById(`option-${i}`).textContent = opt;
+            });
+
+            // Reset option styles
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.classList.remove('correct');
+            });
+
+            updateStatsPanel();
+            showView('question');
+        }
+
+        function showReveal(msg) {
+            document.getElementById('reveal-question-num').textContent = currentQuestion.question_number;
+            document.getElementById('reveal-question-text').textContent = currentQuestion.text;
+            document.getElementById('correct-answer').textContent = msg.correct_answer;
+
+            // Show options with correct highlighted
+            const optionsHtml = currentQuestion.options.map((opt, i) => {
+                const isCorrect = i === msg.correct_index;
+                return `<div class="option-btn option-${i} rounded-lg p-4 text-center ${isCorrect ? 'correct' : 'opacity-50'}">
+                    <span class="font-bold">${['A', 'B', 'C', 'D'][i]}.</span> ${opt}
+                </div>`;
+            }).join('');
+            document.getElementById('reveal-options').innerHTML = optionsHtml;
+
+            // Update leaderboard
+            const leaderboard = document.getElementById('leaderboard');
+            leaderboard.innerHTML = msg.rankings.map((p, i) =>
+                `<li class="bg-gray-700 rounded p-3 flex justify-between">
+                    <span>${i + 1}. ${p.name}</span>
+                    <span class="font-bold">${p.score} pts</span>
+                </li>`
+            ).join('');
+
+            showView('reveal');
+        }
+
+        function showGameOver(msg) {
+            document.getElementById('winner-name').textContent = msg.winner;
+
+            const rankings = document.getElementById('final-rankings');
+            rankings.innerHTML = msg.final_rankings.map((p, i) => {
+                const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '';
+                return `<li class="bg-gray-700 rounded p-4 flex justify-between items-center ${i === 0 ? 'bg-yellow-900' : ''}">
+                    <span class="text-xl">${medal} ${p.rank}. ${p.name}</span>
+                    <span class="font-bold text-xl">${p.score} pts</span>
+                </li>`;
+            }).join('');
+
+            showView('gameover');
+        }
+
+        function showView(view) {
+            setupView.classList.add('hidden');
+            lobbyView.classList.add('hidden');
+            questionView.classList.add('hidden');
+            revealView.classList.add('hidden');
+            gameoverView.classList.add('hidden');
+
+            document.getElementById(`${view}-view`).classList.remove('hidden');
+
+            const sidebar = document.getElementById('stats-sidebar');
+            if (sidebar) {
+                if (view === 'setup') {
+                    sidebar.classList.add('hidden');
+                } else {
+                    sidebar.classList.remove('hidden');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

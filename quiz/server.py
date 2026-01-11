@@ -230,6 +230,11 @@ def build_reveal_payload(game: GameState) -> dict | None:
 
     return {
         "type": "reveal",
+        "question_index": game.current_question_index,
+        "question_number": game.current_question_index + 1,
+        "total_questions": len(game.questions),
+        "text": question.text,
+        "options": question.options,
         "correct_index": question.correct_index,
         "correct_answer": question.options[question.correct_index],
         "player_results": player_results,

@@ -639,12 +639,32 @@
         }
 
         function showReveal(msg) {
-            document.getElementById('reveal-question-num').textContent = currentQuestion.question_number;
-            document.getElementById('reveal-question-text').textContent = currentQuestion.text;
+            const questionNumber = msg.question_number ?? (currentQuestion ? currentQuestion.question_number : null);
+            const questionText = msg.text ?? (currentQuestion ? currentQuestion.text : '');
+            const questionOptions = Array.isArray(msg.options)
+                ? msg.options
+                : (currentQuestion ? currentQuestion.options : []);
+
+            if (msg.question_index !== undefined && msg.question_index !== null) {
+                currentQuestionIndex = msg.question_index;
+            }
+            if (msg.total_questions !== undefined && msg.total_questions !== null) {
+                document.getElementById('reveal-total-questions').textContent = msg.total_questions;
+            }
+
+            if (questionNumber !== null) {
+                document.getElementById('reveal-question-num').textContent = questionNumber;
+            }
+            document.getElementById('reveal-question-text').textContent = questionText;
+            currentQuestion = {
+                question_number: questionNumber,
+                text: questionText,
+                options: questionOptions,
+            };
             document.getElementById('correct-answer').textContent = msg.correct_answer;
 
             // Show options with correct highlighted
-            const optionsHtml = currentQuestion.options.map((opt, i) => {
+            const optionsHtml = questionOptions.map((opt, i) => {
                 const isCorrect = i === msg.correct_index;
                 return `<div class="option-btn option-${i} rounded-lg p-3 sm:p-4 ${isCorrect ? 'correct' : 'opacity-40'}">
                     <span class="font-bold mr-2 shrink-0">${['A', 'B', 'C', 'D'][i]}.</span>${opt}

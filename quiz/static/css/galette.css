@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Cormorant+Garamond:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
   --cream: #f8f2e6;
@@ -19,7 +19,7 @@
     radial-gradient(circle at 90% 12%, rgba(217, 180, 105, 0.35), transparent 50%),
     linear-gradient(135deg, #f8f2e6 0%, #efe0c2 45%, #e6cca1 100%);
   color: var(--deep);
-  font-family: "Cormorant Garamond", "Garamond", "Times New Roman", serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   letter-spacing: 0.01em;
   min-height: 100vh;
   position: relative;
@@ -62,15 +62,16 @@
 }
 
 .galette-body h1 {
-  font-family: "Cinzel", "Cormorant Garamond", serif;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
 .galette-body h2,
 .galette-body h3 {
-  font-family: "Cinzel", "Cormorant Garamond", serif;
-  letter-spacing: 0.05em;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.01em;
 }
 
 .galette-body p,
@@ -79,7 +80,7 @@
 .galette-body label,
 .galette-body input,
 .galette-body button {
-  font-family: "Cormorant Garamond", "Garamond", "Times New Roman", serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 .galette-body .bg-gray-800 {
@@ -168,13 +169,23 @@
 
 .option-btn {
   transition: transform 0.15s ease, box-shadow 0.2s ease;
-  min-height: 80px;
+  min-height: 60px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  text-align: left;
+  padding: 14px 16px;
   border: 2px solid rgba(255, 255, 255, 0.2);
   box-shadow: 0 6px 14px var(--shadow);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
+  line-height: 1.4;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.option-btn span {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .option-btn:active {
@@ -237,5 +248,35 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* Question text handling for long questions */
+.question-text {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  line-height: 1.5;
+}
+
+/* Mobile-specific styles */
+@media (max-width: 640px) {
+  .galette-shell {
+    border-radius: 16px;
+    padding-bottom: env(safe-area-inset-bottom, 16px);
+  }
+
+  .option-btn {
+    font-size: 0.95rem;
+    min-height: 52px;
+    padding: 12px 14px;
+  }
+
+  .galette-body h1 {
+    font-size: 1.5rem;
+  }
+
+  .galette-body h2 {
+    font-size: 1.1rem;
   }
 }

@@ -49,20 +49,20 @@
                 <div id="question-view" class="hidden">
                     <div class="bg-gray-800 rounded-lg p-6 mb-6">
                         <p class="text-gray-400 text-center mb-2">Question <span id="question-num">1</span> of <span id="total-questions">5</span></p>
-                        <h2 id="question-text" class="text-2xl font-semibold text-center mb-6"></h2>
+                        <h2 id="question-text" class="text-xl sm:text-2xl font-semibold text-center mb-6 leading-relaxed question-text"></h2>
 
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="option-btn option-0 rounded-lg p-4 text-center">
-                                <span class="font-bold">A.</span> <span id="option-0"></span>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                            <div class="option-btn option-0 rounded-lg p-3 sm:p-4">
+                                <span class="font-bold shrink-0">A.</span> <span id="option-0"></span>
                             </div>
-                            <div class="option-btn option-1 rounded-lg p-4 text-center">
-                                <span class="font-bold">B.</span> <span id="option-1"></span>
+                            <div class="option-btn option-1 rounded-lg p-3 sm:p-4">
+                                <span class="font-bold shrink-0">B.</span> <span id="option-1"></span>
                             </div>
-                            <div class="option-btn option-2 rounded-lg p-4 text-center">
-                                <span class="font-bold">C.</span> <span id="option-2"></span>
+                            <div class="option-btn option-2 rounded-lg p-3 sm:p-4">
+                                <span class="font-bold shrink-0">C.</span> <span id="option-2"></span>
                             </div>
-                            <div class="option-btn option-3 rounded-lg p-4 text-center">
-                                <span class="font-bold">D.</span> <span id="option-3"></span>
+                            <div class="option-btn option-3 rounded-lg p-3 sm:p-4">
+                                <span class="font-bold shrink-0">D.</span> <span id="option-3"></span>
                             </div>
                         </div>
                     </div>
@@ -84,9 +84,9 @@
                 <div id="reveal-view" class="hidden">
                     <div class="bg-gray-800 rounded-lg p-6 mb-6">
                         <p class="text-gray-400 text-center mb-2">Question <span id="reveal-question-num">1</span> of <span id="reveal-total-questions">5</span></p>
-                        <h2 id="reveal-question-text" class="text-2xl font-semibold text-center mb-6"></h2>
+                        <h2 id="reveal-question-text" class="text-xl sm:text-2xl font-semibold text-center mb-6 leading-relaxed question-text"></h2>
 
-                        <div class="grid grid-cols-2 gap-4 mb-6" id="reveal-options"></div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6" id="reveal-options"></div>
 
                         <p class="text-center text-xl">
                             Correct Answer: <span id="correct-answer" class="text-green-400 font-bold"></span>
@@ -334,8 +334,8 @@
             // Show options with correct highlighted
             const optionsHtml = currentQuestion.options.map((opt, i) => {
                 const isCorrect = i === msg.correct_index;
-                return `<div class="option-btn option-${i} rounded-lg p-4 text-center ${isCorrect ? 'correct' : 'opacity-50'}">
-                    <span class="font-bold">${['A', 'B', 'C', 'D'][i]}.</span> ${opt}
+                return `<div class="option-btn option-${i} rounded-lg p-3 sm:p-4 ${isCorrect ? 'correct' : 'opacity-50'}">
+                    <span class="font-bold shrink-0">${['A', 'B', 'C', 'D'][i]}.</span> ${opt}
                 </div>`;
             }).join('');
             document.getElementById('reveal-options').innerHTML = optionsHtml;

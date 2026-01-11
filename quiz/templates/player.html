@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="/static/css/galette.css">
 </head>
 <body class="galette-body">
-    <div class="container mx-auto px-4 py-6 max-w-lg galette-shell">
+    <div class="container mx-auto px-3 sm:px-4 py-4 sm:py-6 max-w-lg galette-shell">
         <!-- Join View -->
         <div id="join-view">
             <h1 class="text-2xl font-bold text-center mb-8">Join Quiz</h1>
@@ -53,22 +53,22 @@
                 <p class="text-gray-400">Question <span id="question-num">1</span> of <span id="total-questions">5</span></p>
             </div>
 
-            <div class="bg-gray-800 rounded-lg p-4 mb-6">
-                <h2 id="question-text" class="text-xl font-semibold text-center"></h2>
+            <div class="bg-gray-800 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
+                <h2 id="question-text" class="text-base sm:text-lg md:text-xl font-semibold text-center leading-relaxed question-text"></h2>
             </div>
 
-            <div class="grid grid-cols-1 gap-3" id="options-container">
-                <button class="option-btn option-0 rounded-lg text-lg font-semibold" data-index="0">
-                    <span class="mr-2 font-bold">A.</span> <span id="option-text-0"></span>
+            <div class="grid grid-cols-1 gap-2 sm:gap-3" id="options-container">
+                <button class="option-btn option-0 rounded-lg text-base sm:text-lg font-medium" data-index="0">
+                    <span class="mr-2 font-bold shrink-0">A.</span> <span id="option-text-0"></span>
                 </button>
-                <button class="option-btn option-1 rounded-lg text-lg font-semibold" data-index="1">
-                    <span class="mr-2 font-bold">B.</span> <span id="option-text-1"></span>
+                <button class="option-btn option-1 rounded-lg text-base sm:text-lg font-medium" data-index="1">
+                    <span class="mr-2 font-bold shrink-0">B.</span> <span id="option-text-1"></span>
                 </button>
-                <button class="option-btn option-2 rounded-lg text-lg font-semibold" data-index="2">
-                    <span class="mr-2 font-bold">C.</span> <span id="option-text-2"></span>
+                <button class="option-btn option-2 rounded-lg text-base sm:text-lg font-medium" data-index="2">
+                    <span class="mr-2 font-bold shrink-0">C.</span> <span id="option-text-2"></span>
                 </button>
-                <button class="option-btn option-3 rounded-lg text-lg font-semibold" data-index="3">
-                    <span class="mr-2 font-bold">D.</span> <span id="option-text-3"></span>
+                <button class="option-btn option-3 rounded-lg text-base sm:text-lg font-medium" data-index="3">
+                    <span class="mr-2 font-bold shrink-0">D.</span> <span id="option-text-3"></span>
                 </button>
             </div>
 

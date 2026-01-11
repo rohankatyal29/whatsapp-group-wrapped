@@ -348,6 +348,7 @@ async def get_game_info(game_code: str):
         "phase": game.phase.value,
         "player_count": len(game.players),
         "question_count": len(game.questions),
+        "local_ip": get_local_ip(),
     }
 
 
@@ -432,6 +433,18 @@ async def quiz_master_websocket(websocket: WebSocket, game_code: str):
         "current_question_index": game.current_question_index,
         "local_ip": get_local_ip(),
     })
+
+    # Send current phase-specific state for master reconnection
+    if game.phase == GamePhase.QUESTION:
+        payload = build_question_payload(game)
+        if payload:
+            await websocket.send_json(payload)
+    elif game.phase == GamePhase.REVEAL:
+        payload = build_reveal_payload(game)
+        if payload:
+            await websocket.send_json(payload)
+    elif game.phase == GamePhase.FINISHED:
+        await websocket.send_json(build_game_over_payload(game))
 
     try:
         while True:

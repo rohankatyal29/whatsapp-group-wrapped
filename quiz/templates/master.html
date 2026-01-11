@@ -43,6 +43,26 @@
                     </svg>
                 </div>
 
+                <!-- Recovery Prompt View -->
+                <div id="recovery-view" class="hidden text-center">
+                    <div class="mb-8">
+                        <svg class="mx-auto mb-6 winner-crown" style="width: 80px; height: 60px;">
+                            <use href="#crown-icon"/>
+                        </svg>
+                        <p class="text-xl mb-4 text-gray-300">You have an active game!</p>
+                        <p class="text-4xl font-bold tracking-widest text-purple-400 mb-2" id="recovery-game-code"></p>
+                        <p class="text-gray-500 mb-6">Would you like to rejoin?</p>
+                    </div>
+                    <div class="flex gap-4 justify-center">
+                        <button id="rejoin-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-lg text-xl">
+                            Rejoin Game
+                        </button>
+                        <button id="new-game-btn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-4 px-8 rounded-lg text-xl">
+                            Start New Game
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Setup View -->
                 <div id="setup-view" class="text-center">
                     <div class="mb-8">
@@ -55,6 +75,18 @@
                     <button id="create-game-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-8 rounded-lg text-xl">
                         Create Game
                     </button>
+
+                    <div class="mt-8 pt-6 border-t border-gray-700">
+                        <p class="text-gray-500 mb-4 text-sm">Already have a game code?</p>
+                        <div class="flex gap-2 justify-center max-w-sm mx-auto">
+                            <input type="text" id="manual-game-code" placeholder="ABCD" maxlength="4"
+                                   class="bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-center text-2xl font-bold tracking-widest uppercase w-32 focus:border-purple-500 focus:outline-none">
+                            <button id="manual-rejoin-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg">
+                                Rejoin
+                            </button>
+                        </div>
+                        <p id="rejoin-error" class="text-red-400 mt-2 hidden text-sm"></p>
+                    </div>
                 </div>
 
                 <!-- Lobby View -->
@@ -123,6 +155,24 @@
                     <button id="reveal-btn" class="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-4 px-8 rounded-lg text-xl">
                         Reveal Answer
                     </button>
+                </div>
+
+                <!-- Reveal Confirmation Modal -->
+                <div id="reveal-confirm-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
+                    <div class="bg-gray-800 rounded-lg p-6 max-w-md mx-4">
+                        <h3 class="text-xl font-bold text-yellow-400 mb-4">Not Everyone Has Answered!</h3>
+                        <p class="text-gray-300 mb-4">The following players haven't answered yet:</p>
+                        <ul id="unanswered-players-list" class="bg-gray-700 rounded p-3 mb-4 max-h-40 overflow-y-auto"></ul>
+                        <p class="text-gray-400 mb-6">Do you still want to reveal the answer?</p>
+                        <div class="flex gap-4">
+                            <button id="confirm-reveal-btn" class="flex-1 bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 px-6 rounded-lg">
+                                Yes, Reveal
+                            </button>
+                            <button id="cancel-reveal-btn" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Reveal View -->
@@ -207,28 +257,133 @@
         let latestPlayers = [];
 
         // DOM Elements
+        const recoveryView = document.getElementById('recovery-view');
         const setupView = document.getElementById('setup-view');
         const lobbyView = document.getElementById('lobby-view');
         const questionView = document.getElementById('question-view');
         const revealView = document.getElementById('reveal-view');
         const gameoverView = document.getElementById('gameover-view');
 
-        // Setup
+        // Setup event listeners
         document.getElementById('create-game-btn').addEventListener('click', createGame);
         document.getElementById('start-game-btn').addEventListener('click', () => sendMessage({ type: 'start_game' }));
-        document.getElementById('reveal-btn').addEventListener('click', () => sendMessage({ type: 'reveal_answer' }));
+        document.getElementById('reveal-btn').addEventListener('click', handleRevealClick);
         document.getElementById('next-btn').addEventListener('click', () => sendMessage({ type: 'next_question' }));
+
+        // Reveal confirmation modal handlers
+        document.getElementById('confirm-reveal-btn').addEventListener('click', () => {
+            document.getElementById('reveal-confirm-modal').classList.add('hidden');
+            sendMessage({ type: 'reveal_answer' });
+        });
+        document.getElementById('cancel-reveal-btn').addEventListener('click', () => {
+            document.getElementById('reveal-confirm-modal').classList.add('hidden');
+        });
+
+        // Recovery event listeners
+        document.getElementById('rejoin-btn').addEventListener('click', () => rejoinGame(localStorage.getItem('quizMasterGameCode')));
+        document.getElementById('new-game-btn').addEventListener('click', () => {
+            localStorage.removeItem('quizMasterGameCode');
+            showView('setup');
+        });
+        document.getElementById('manual-rejoin-btn').addEventListener('click', () => {
+            const code = document.getElementById('manual-game-code').value.toUpperCase().trim();
+            if (code.length === 4) {
+                rejoinGame(code);
+            } else {
+                showRejoinError('Please enter a 4-letter code');
+            }
+        });
+        document.getElementById('manual-game-code').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('manual-rejoin-btn').click();
+            }
+        });
+
+        // Check for saved game on page load
+        checkForSavedGame();
 
         async function createGame() {
             const response = await fetch('/api/create-game', { method: 'POST' });
             const data = await response.json();
             gameCode = data.code;
 
+            // Save game code to localStorage for recovery after refresh
+            localStorage.setItem('quizMasterGameCode', gameCode);
+
             document.getElementById('game-code').textContent = gameCode;
             document.getElementById('join-url').textContent = `http://${data.local_ip}:8000/play`;
 
             showView('lobby');
             connectWebSocket();
+        }
+
+        async function checkForSavedGame() {
+            const savedCode = localStorage.getItem('quizMasterGameCode');
+            if (!savedCode) {
+                showView('setup');
+                return;
+            }
+
+            // Verify the game still exists
+            try {
+                const response = await fetch(`/api/game/${savedCode}`);
+                const data = await response.json();
+
+                if (data.error) {
+                    // Game no longer exists, clear localStorage
+                    localStorage.removeItem('quizMasterGameCode');
+                    showView('setup');
+                    return;
+                }
+
+                // Game exists - show recovery prompt
+                document.getElementById('recovery-game-code').textContent = savedCode;
+                showView('recovery');
+            } catch (e) {
+                // Error checking game - clear localStorage and show setup
+                localStorage.removeItem('quizMasterGameCode');
+                showView('setup');
+            }
+        }
+
+        async function rejoinGame(code) {
+            if (!code) {
+                showRejoinError('No game code provided');
+                return;
+            }
+
+            code = code.toUpperCase();
+
+            // Verify the game exists
+            try {
+                const response = await fetch(`/api/game/${code}`);
+                const data = await response.json();
+
+                if (data.error) {
+                    showRejoinError('Game not found');
+                    localStorage.removeItem('quizMasterGameCode');
+                    return;
+                }
+
+                // Game exists - connect to it
+                gameCode = code;
+                localStorage.setItem('quizMasterGameCode', gameCode);
+
+                // Set up the UI with game info
+                document.getElementById('game-code').textContent = gameCode;
+                document.getElementById('join-url').textContent = `http://${data.local_ip || window.location.hostname}:8000/play`;
+
+                connectWebSocket();
+            } catch (e) {
+                showRejoinError('Failed to connect to game');
+            }
+        }
+
+        function showRejoinError(message) {
+            const errorEl = document.getElementById('rejoin-error');
+            errorEl.textContent = message;
+            errorEl.classList.remove('hidden');
+            setTimeout(() => errorEl.classList.add('hidden'), 3000);
         }
 
         function connectWebSocket() {
@@ -239,8 +394,18 @@
                 handleMessage(msg);
             };
 
-            ws.onclose = () => {
-                console.log('WebSocket closed');
+            ws.onclose = (event) => {
+                console.log('WebSocket closed', event.code);
+                // Code 4004 means game not found
+                if (event.code === 4004) {
+                    localStorage.removeItem('quizMasterGameCode');
+                    showRejoinError('Game not found');
+                    showView('setup');
+                }
+            };
+
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
             };
         }
 
@@ -250,14 +415,51 @@
             }
         }
 
+        function handleRevealClick() {
+            const unansweredPlayers = latestPlayers.filter(p => p.connected !== false && !p.has_answered);
+
+            if (unansweredPlayers.length === 0) {
+                // Everyone answered, reveal immediately
+                sendMessage({ type: 'reveal_answer' });
+            } else {
+                // Show confirmation modal with unanswered player names
+                const list = document.getElementById('unanswered-players-list');
+                list.innerHTML = unansweredPlayers.map(p =>
+                    `<li class="text-yellow-400 py-1">${p.name}</li>`
+                ).join('');
+                document.getElementById('reveal-confirm-modal').classList.remove('hidden');
+            }
+        }
+
         function handleMessage(msg) {
             switch (msg.type) {
+                case 'error':
+                    console.error('Game error:', msg.message);
+                    if (msg.message === 'Game not found') {
+                        localStorage.removeItem('quizMasterGameCode');
+                        showRejoinError('Game not found');
+                        showView('setup');
+                    }
+                    break;
+
                 case 'game_state':
                     updatePlayerList(msg.players);
                     updateStatsPanel(msg.players);
                     currentQuestionIndex = msg.current_question_index ?? null;
                     document.getElementById('total-questions').textContent = msg.question_count;
                     document.getElementById('reveal-total-questions').textContent = msg.question_count;
+
+                    // Show the correct view based on game phase
+                    if (msg.phase === 'lobby') {
+                        showView('lobby');
+                    } else if (msg.phase === 'question') {
+                        // Will be shown when question message arrives
+                        showView('question');
+                    } else if (msg.phase === 'reveal') {
+                        showView('reveal');
+                    } else if (msg.phase === 'finished') {
+                        showView('gameover');
+                    }
                     break;
 
                 case 'player_list':
@@ -288,6 +490,8 @@
                 case 'game_over':
                     showGameOver(msg);
                     updateStatsPanel();
+                    // Clear localStorage since game is finished
+                    localStorage.removeItem('quizMasterGameCode');
                     break;
 
                 case 'player_disconnected':
@@ -473,6 +677,7 @@
         }
 
         function showView(view) {
+            recoveryView.classList.add('hidden');
             setupView.classList.add('hidden');
             lobbyView.classList.add('hidden');
             questionView.classList.add('hidden');
@@ -483,7 +688,7 @@
 
             const sidebar = document.getElementById('stats-sidebar');
             if (sidebar) {
-                if (view === 'setup') {
+                if (view === 'setup' || view === 'recovery') {
                     sidebar.classList.add('hidden');
                 } else {
                     sidebar.classList.remove('hidden');

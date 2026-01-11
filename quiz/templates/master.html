@@ -634,7 +634,11 @@
                 btn.classList.remove('correct');
             });
 
-            updateStatsPanel();
+            if (msg.players) {
+                updateStatsPanel(msg.players);
+            } else {
+                updateStatsPanel();
+            }
             showView('question');
         }
 

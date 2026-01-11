@@ -204,6 +204,7 @@ def build_question_payload(game: GameState) -> dict | None:
         "answered_count": answered_count,
         "total_players": total_players,
         "remaining_count": max(0, total_players - answered_count),
+        "players": [p.to_dict() for p in game.players.values()],
     }
 
 

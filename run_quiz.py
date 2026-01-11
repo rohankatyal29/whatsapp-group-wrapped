@@ -18,9 +18,29 @@ def get_local_ip() -> str:
     return ip
 
 
+def is_port_available(port: int) -> bool:
+    """Check if a port is available."""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        try:
+            s.bind(("0.0.0.0", port))
+            return True
+        except OSError:
+            return False
+
+
+def find_available_port(start_port: int = 8000, max_attempts: int = 10) -> int:
+    """Find an available port starting from start_port."""
+    for port in range(start_port, start_port + max_attempts):
+        if is_port_available(port):
+            return port
+    raise RuntimeError(
+        f"No available ports found in range {start_port}-{start_port + max_attempts - 1}"
+    )
+
+
 def main():
     local_ip = get_local_ip()
-    port = 8000
+    port = find_available_port()
 
     print()
     print("=" * 50)
